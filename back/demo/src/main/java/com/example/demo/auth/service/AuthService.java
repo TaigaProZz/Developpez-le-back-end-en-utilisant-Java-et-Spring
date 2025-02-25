@@ -1,5 +1,7 @@
 package com.example.demo.auth.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +17,9 @@ public class AuthService {
   private UserRepository userRepository;
 
 
-  public String login() {
-    User user = this.userRepository.fin();
+  public Optional<User> login(String email, String password) {
+    Optional<User> user = this.userRepository.findByEmail(email);
+    return user;
   }
 
 }
