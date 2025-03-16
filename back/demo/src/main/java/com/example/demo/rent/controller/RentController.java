@@ -1,11 +1,11 @@
 package com.example.demo.rent.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.rent.service.RentService;
 
-@Controller
+@RestController
 public class RentController {
 
   @Autowired

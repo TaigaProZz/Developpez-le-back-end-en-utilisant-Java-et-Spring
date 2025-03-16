@@ -14,9 +14,7 @@ public class UserService {
   @Autowired
   private RentRepository rentRepository;
 
-
   public Iterable<Rent> getUser() {
     return this.rentRepository.findAll();
   }
-
 }

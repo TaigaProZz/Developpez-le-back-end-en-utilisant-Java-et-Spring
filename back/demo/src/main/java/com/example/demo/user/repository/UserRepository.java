@@ -4,10 +4,8 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.example.demo.rent.model.Rent;
 import com.example.demo.user.model.User;
 
-public interface UserRepository extends CrudRepository<Rent, Long>  {
-  boolean existsByEmail(String email);
+public interface UserRepository extends CrudRepository<User, Long>  {
   Optional<User> findByEmail(String email);
 }
