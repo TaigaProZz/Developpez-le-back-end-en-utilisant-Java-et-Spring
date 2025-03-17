@@ -31,12 +31,10 @@ public class User {
   private String password;
 
   @Column(name = "created_at", updatable = false)
-  @JsonProperty("created_at")
   @CreationTimestamp
   private LocalDateTime createdAt;
 
   @Column(name = "updated_at")
-  @JsonProperty("updated_at")
   @UpdateTimestamp
   private LocalDateTime updatedAt;
 

@@ -1,5 +1,6 @@
 package com.example.demo.auth.controller;
 
+import com.example.demo.auth.dto.MeDto;
 import com.example.demo.auth.service.JwtService;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repository.UserRepository;
@@ -86,6 +87,13 @@ public class AuthController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur introuvable");
     }
 
-    return ResponseEntity.ok(user);
+    // map to dto
+    MeDto meDto = new MeDto();
+    meDto.setEmail(email);
+    meDto.setName(user.getName());
+    meDto.setCreated_at(user.getCreatedAt());
+    meDto.setUpdated_at(user.getUpdatedAt());
+
+    return ResponseEntity.ok(meDto);
   }
 }
