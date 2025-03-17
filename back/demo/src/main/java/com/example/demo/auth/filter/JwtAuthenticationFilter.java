@@ -1,5 +1,6 @@
 package com.example.demo.auth.filter;
 
+import com.example.demo.utils.PublicRoutes;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.example.demo.auth.service.JwtService;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -24,6 +26,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       jakarta.servlet.http.HttpServletRequest request,
       jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain)
       throws jakarta.servlet.ServletException, IOException {
+
+    // ignore public endpoints
+    String requestPath = request.getServletPath();
+
+    if (Arrays.asList(PublicRoutes.PUBLIC_URLS).contains(requestPath)) {
+      filterChain.doFilter(request, response);
+      return;
+    }
 
     // extract token from request
     String token = extractJwtFromRequest(request);

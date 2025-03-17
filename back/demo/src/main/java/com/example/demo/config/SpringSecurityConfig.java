@@ -4,6 +4,7 @@ import com.example.demo.auth.service.CustomUserDetailsService;
 import com.example.demo.auth.service.JwtService;
 import com.example.demo.auth.filter.JwtAuthenticationFilter;
 
+import com.example.demo.utils.PublicRoutes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +33,7 @@ public class SpringSecurityConfig {
         return http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // allow access to some endpoints without authentication and secure the rest
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        .requestMatchers(PublicRoutes.PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated())
                 // add JWT filter to validate token and set authentication
                 .addFilterBefore(new JwtAuthenticationFilter(jwtService), UsernamePasswordAuthenticationFilter.class)
