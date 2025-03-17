@@ -1,8 +1,8 @@
 package com.example.demo.config;
 
 import com.example.demo.auth.service.CustomUserDetailsService;
-import com.example.demo.jwt.service.JwtService;
-import com.example.demo.jwt.filter.JwtAuthenticationFilter;
+import com.example.demo.auth.service.JwtService;
+import com.example.demo.auth.filter.JwtAuthenticationFilter;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

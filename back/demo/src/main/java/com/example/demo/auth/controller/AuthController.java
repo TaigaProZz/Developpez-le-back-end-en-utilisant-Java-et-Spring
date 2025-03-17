@@ -1,6 +1,6 @@
 package com.example.demo.auth.controller;
 
-import com.example.demo.jwt.service.JwtService;
+import com.example.demo.auth.service.JwtService;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repository.UserRepository;
 

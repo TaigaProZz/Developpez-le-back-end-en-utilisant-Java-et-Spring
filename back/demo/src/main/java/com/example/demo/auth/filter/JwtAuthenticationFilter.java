@@ -1,11 +1,12 @@
-package com.example.demo.jwt.filter;
+package com.example.demo.auth.filter;
 
-import com.example.demo.jwt.service.JwtService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.example.demo.auth.service.JwtService;
 
 import java.io.IOException;
 
