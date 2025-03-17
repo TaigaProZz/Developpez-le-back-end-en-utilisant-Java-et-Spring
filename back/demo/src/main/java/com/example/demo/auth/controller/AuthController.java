@@ -1,6 +1,7 @@
 package com.example.demo.auth.controller;
 
 import com.example.demo.auth.dto.MeDto;
+import com.example.demo.auth.dto.RegisterDto;
 import com.example.demo.auth.service.JwtService;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repository.UserRepository;
@@ -58,22 +59,28 @@ public class AuthController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<String> register(@RequestBody User user) {
+  public ResponseEntity<?> register(@RequestBody RegisterDto registerDto) {
     // check if email is already used
-    Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+    Optional<User> existingUser = userRepository.findByEmail(registerDto.getEmail());
 
     if (existingUser.isPresent()) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body("Email déjà utilisé");
     }
 
-    // encode password and save user
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    // bind user from dto
+    User user = new User();
+    user.setEmail(registerDto.getEmail());
+    user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+    user.setName(registerDto.getName());
 
     userRepository.save(user);
 
     // generate token and return it
     String token = jwtService.generateToken(user.getEmail());
-    return ResponseEntity.ok(token);
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("token", token);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/me")
