@@ -96,6 +96,7 @@ public class AuthController {
 
     // map to dto
     MeDto meDto = new MeDto();
+    meDto.setId(user.getId());
     meDto.setEmail(email);
     meDto.setName(user.getName());
     meDto.setCreated_at(user.getCreatedAt());
