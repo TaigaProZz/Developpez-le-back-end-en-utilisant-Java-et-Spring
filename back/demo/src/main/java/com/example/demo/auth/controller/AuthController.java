@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +37,7 @@ public class AuthController {
 
   @PostMapping("/login")
   public ResponseEntity<Map<String,Object>> login(@RequestBody User loginRequest) {
+    System.out.println(loginRequest);
     // try to find user by email
     User user = userRepository.findByEmail(loginRequest.getEmail())
         .orElse(null);
@@ -42,9 +45,8 @@ public class AuthController {
     // if user not found or password is incorrect
     if (user == null || !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
       Map<String, Object> errorResponse = new HashMap<>();
-      errorResponse.put("status", "error");
-      errorResponse.put("message", "Identifiants incorrects");
-      return ResponseEntity.badRequest().body(errorResponse);
+      errorResponse.put("message", "error");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     // generate token and return it
@@ -60,7 +62,7 @@ public class AuthController {
     Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
 
     if (existingUser.isPresent()) {
-      return ResponseEntity.badRequest().body("Email déjà utilisé");
+      return ResponseEntity.status(HttpStatus.CONFLICT).body("Email déjà utilisé");
     }
 
     // encode password and save user
@@ -81,7 +83,7 @@ public class AuthController {
     User user = userRepository.findByEmail(email).orElse(null);
 
     if (user == null) {
-      return ResponseEntity.status(404).body("Utilisateur introuvable");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur introuvable");
     }
 
     return ResponseEntity.ok(user);

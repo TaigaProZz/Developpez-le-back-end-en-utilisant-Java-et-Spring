@@ -1,5 +1,6 @@
 package com.example.demo.auth.filter;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,15 +28,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // extract token from request
     String token = extractJwtFromRequest(request);
 
-    // if token is valid, set authentication
-    if (token != null && jwtService.validateToken(token)) {
-      String email = jwtService.getEmailFromToken(token);
-
-      UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null,
-          null);
-
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+    if (token == null || !jwtService.validateToken(token)) {
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.getWriter().flush();
+      return;
     }
+
+    String email = jwtService.getEmailFromToken(token);
+    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null, null);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
     filterChain.doFilter(request, response);
   }
