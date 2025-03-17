@@ -1,5 +1,8 @@
 package com.example.demo.auth.controller;
 
+import com.example.demo.auth.dto.LoginDto;
+import com.example.demo.auth.dto.MeDto;
+import com.example.demo.auth.dto.RegisterDto;
 import com.example.demo.auth.service.JwtService;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repository.UserRepository;
@@ -36,14 +39,13 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Map<String,Object>> login(@RequestBody User loginRequest) {
-    System.out.println(loginRequest);
+  public ResponseEntity<Map<String,Object>> login(@RequestBody LoginDto loginDto) {
     // try to find user by email
-    User user = userRepository.findByEmail(loginRequest.getEmail())
+    User user = userRepository.findByEmail(loginDto.getEmail())
         .orElse(null);
        
     // if user not found or password is incorrect
-    if (user == null || !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+    if (user == null || !passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
       Map<String, Object> errorResponse = new HashMap<>();
       errorResponse.put("message", "error");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
@@ -57,22 +59,28 @@ public class AuthController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<String> register(@RequestBody User user) {
+  public ResponseEntity<?> register(@RequestBody RegisterDto registerDto) {
     // check if email is already used
-    Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+    Optional<User> existingUser = userRepository.findByEmail(registerDto.getEmail());
 
     if (existingUser.isPresent()) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body("Email déjà utilisé");
     }
 
-    // encode password and save user
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    // bind user from dto
+    User user = new User();
+    user.setEmail(registerDto.getEmail());
+    user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+    user.setName(registerDto.getName());
 
     userRepository.save(user);
 
     // generate token and return it
     String token = jwtService.generateToken(user.getEmail());
-    return ResponseEntity.ok(token);
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("token", token);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/me")
@@ -86,6 +94,14 @@ public class AuthController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur introuvable");
     }
 
-    return ResponseEntity.ok(user);
+    // map to dto
+    MeDto meDto = new MeDto();
+    meDto.setId(user.getId());
+    meDto.setEmail(email);
+    meDto.setName(user.getName());
+    meDto.setCreated_at(user.getCreatedAt());
+    meDto.setUpdated_at(user.getUpdatedAt());
+
+    return ResponseEntity.ok(meDto);
   }
 }
