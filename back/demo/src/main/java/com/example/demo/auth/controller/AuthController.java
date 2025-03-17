@@ -1,5 +1,6 @@
 package com.example.demo.auth.controller;
 
+import com.example.demo.auth.dto.LoginDto;
 import com.example.demo.auth.dto.MeDto;
 import com.example.demo.auth.dto.RegisterDto;
 import com.example.demo.auth.service.JwtService;
@@ -38,14 +39,13 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Map<String,Object>> login(@RequestBody User loginRequest) {
-    System.out.println(loginRequest);
+  public ResponseEntity<Map<String,Object>> login(@RequestBody LoginDto loginDto) {
     // try to find user by email
-    User user = userRepository.findByEmail(loginRequest.getEmail())
+    User user = userRepository.findByEmail(loginDto.getEmail())
         .orElse(null);
        
     // if user not found or password is incorrect
-    if (user == null || !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+    if (user == null || !passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
       Map<String, Object> errorResponse = new HashMap<>();
       errorResponse.put("message", "error");
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
