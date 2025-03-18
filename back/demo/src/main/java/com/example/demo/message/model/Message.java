@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Data
 @Entity
@@ -19,12 +21,18 @@ public class Message {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  private Long user_id;
+
+  private Long rental_id;
+
   private String message;
-  
+
   @Column(name = "created_at")
+  @CreationTimestamp
   private Date createdAt;
 
   @Column(name = "updated_at")
+  @UpdateTimestamp
   private Date updatedAt;
 
 }

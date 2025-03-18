@@ -1,13 +1,15 @@
 package com.example.demo.message.controller;
 
+import com.example.demo.message.dto.SendMessageDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.message.model.Message;
 import com.example.demo.message.service.MessageService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/messages")
@@ -16,8 +18,25 @@ public class MessageController {
   @Autowired
   private MessageService messageService;
   
-  @GetMapping(path = "/")
-  public @ResponseBody Iterable<Message> getAllUsers() {
-      return this.messageService.getAllMessages();
+  /**
+   * Handles the HTTP POST request to create and save a new message.
+   *
+   * @param sendMessageDto the data transfer object containing the message details
+   * such as the message content, user ID, and rental ID
+   * @return a ResponseEntity containing a success response message
+   */
+  @PostMapping("/")
+  public ResponseEntity<?> sendMessage(@RequestBody SendMessageDto sendMessageDto) {
+    Message message = new Message();
+
+    message.setMessage(sendMessageDto.getMessage());
+    message.setUser_id(sendMessageDto.getUser_id());
+    message.setRental_id(sendMessageDto.getRental_id());
+
+    messageService.saveMessage(message);
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("message", "Message send with success");
+    return ResponseEntity.ok(response);
   }
 }
