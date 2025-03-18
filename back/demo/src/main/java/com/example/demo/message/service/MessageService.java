@@ -14,9 +14,14 @@ public class MessageService {
   @Autowired
   private MessageRepository messageRepository;
 
-
-  public Iterable<Message> getAllMessages() {
-    return this.messageRepository.findAll();
+  /**
+   * Save a Message entity to the database.
+   *
+   * @param message the Message object to be saved
+   * @return the saved Message object
+   */
+  public Message saveMessage(Message message) {
+    return this.messageRepository.save(message);
   }
 
 }
