@@ -1,7 +1,7 @@
 package com.example.demo.auth.controller;
 
 import com.example.demo.auth.dto.LoginDto;
-import com.example.demo.auth.dto.MeDto;
+import com.example.demo.user.dto.GetUserDto;
 import com.example.demo.auth.dto.RegisterDto;
 import com.example.demo.auth.service.JwtService;
 import com.example.demo.user.model.User;
@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -95,13 +94,13 @@ public class AuthController {
     }
 
     // map to dto
-    MeDto meDto = new MeDto();
-    meDto.setId(user.getId());
-    meDto.setEmail(email);
-    meDto.setName(user.getName());
-    meDto.setCreated_at(user.getCreatedAt());
-    meDto.setUpdated_at(user.getUpdatedAt());
+    GetUserDto getUserDto = new GetUserDto();
+    getUserDto.setId(user.getId());
+    getUserDto.setEmail(email);
+    getUserDto.setName(user.getName());
+    getUserDto.setCreated_at(user.getCreatedAt());
+    getUserDto.setUpdated_at(user.getUpdatedAt());
 
-    return ResponseEntity.ok(meDto);
+    return ResponseEntity.ok(getUserDto);
   }
 }

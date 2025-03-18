@@ -1,4 +1,4 @@
-package com.example.demo.auth.dto;
+package com.example.demo.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MeDto {
+public class GetUserDto {
     private Long id;
     private String email;
     private String name;
