@@ -23,27 +23,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(
-      jakarta.servlet.http.HttpServletRequest request,
-      jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain)
-      throws jakarta.servlet.ServletException, IOException {
+          jakarta.servlet.http.HttpServletRequest request,
+          jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain)
+          throws jakarta.servlet.ServletException, IOException {
 
-    // ignore public endpoints
     String requestPath = request.getServletPath();
 
+    // swagger authorization
+    if (requestPath.startsWith("/swagger-ui") || requestPath.startsWith("/api/v3/api-docs")) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
+    // public endpoints authorization
     if (Arrays.asList(PublicRoutes.PUBLIC_URLS).contains(requestPath)) {
       filterChain.doFilter(request, response);
       return;
     }
 
-    // extract token from request
+    // extract token and check its validity
     String token = extractJwtFromRequest(request);
 
+    // if not valid, return unauthorized err
     if (token == null || !jwtService.validateToken(token)) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       response.getWriter().flush();
       return;
     }
 
+    // if valid, authorize the request
     String email = jwtService.getEmailFromToken(token);
     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null, null);
     SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -51,6 +59,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
+
+  /**
+   * Extracts the JWT token from the HTTP request's Authorization header.
+   *
+   * @param request the HTTP request containing the Authorization header from which the JWT token is extracted
+   * @return the JWT token if present and valid, otherwise null
+   */
   private String extractJwtFromRequest(jakarta.servlet.http.HttpServletRequest request) {
     // get token from authorization header
     String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
