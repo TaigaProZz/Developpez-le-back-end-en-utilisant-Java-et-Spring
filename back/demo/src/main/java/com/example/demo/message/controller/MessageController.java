@@ -15,8 +15,11 @@ import java.util.Map;
 @RequestMapping("/messages")
 public class MessageController {
 
-  @Autowired
-  private MessageService messageService;
+  private final MessageService messageService;
+
+  public MessageController(MessageService messageService) {
+    this.messageService = messageService;
+  }
   
   /**
    * Handles the HTTP POST request to create and save a new message.
