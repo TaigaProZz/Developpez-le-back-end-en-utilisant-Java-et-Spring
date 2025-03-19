@@ -18,6 +18,14 @@ public class RentController {
   @Autowired
   private RentService rentService;
 
+  @GetMapping("/")
+  public ResponseEntity<Iterable<GetRentalDto>> getAllRents() {
+
+    Iterable<GetRentalDto> getRentalsDto = rentService.getAllRents();
+
+    return ResponseEntity.ok(getRentalsDto);
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<?> getRentalById(@PathVariable Long id) {
 

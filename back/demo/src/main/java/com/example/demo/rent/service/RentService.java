@@ -9,6 +9,9 @@ import com.example.demo.rent.repository.RentRepository;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Service
 public class RentService {
@@ -16,9 +19,27 @@ public class RentService {
   private RentRepository rentRepository;
 
 
-  public Iterable<Rent> getAllRents() {
-    return this.rentRepository.findAll();
+  public Iterable<GetRentalDto> getAllRents() {
+    List<GetRentalDto> allRentsDto = new ArrayList<>();
+
+    Iterable<Rent> rents = this.rentRepository.findAll();
+    for (Rent rent : rents) {
+      GetRentalDto dto = new GetRentalDto();
+      dto.setId(rent.getId());
+      dto.setSurface(rent.getSurface());
+      dto.setPrice(rent.getPrice());
+      dto.setPicture(rent.getPicture());
+      dto.setDescription(rent.getDescription());
+      dto.setOwner_id(rent.getOwner_id());
+      dto.setCreated_at(rent.getCreatedAt());
+      dto.setUpdated_at(rent.getUpdatedAt());
+
+      allRentsDto.add(dto);
+    }
+
+    return allRentsDto;
   }
+
 
   public GetRentalDto getRentalDtoById(Long id) {
     Rent rent = rentRepository.findById(id).orElse(null);
