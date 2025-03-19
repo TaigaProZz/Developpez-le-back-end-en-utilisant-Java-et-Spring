@@ -31,7 +31,7 @@ public class RentController {
     this.userRepository = userRepository;
   }
 
-  @PostMapping(path = "/",  consumes = "multipart/form-data")
+  @PostMapping(consumes = "multipart/form-data")
   public ResponseEntity<?> createRental(
           @ModelAttribute CreateRentalDto requestBody,
           @RequestParam("picture") MultipartFile file) {
