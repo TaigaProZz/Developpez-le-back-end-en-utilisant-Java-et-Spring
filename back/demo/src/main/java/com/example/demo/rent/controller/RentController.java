@@ -5,18 +5,15 @@ import com.example.demo.rent.dto.GetRentalDto;
 import com.example.demo.rent.dto.UpdateRentalDto;
 import com.example.demo.rent.model.Rent;
 import com.example.demo.user.model.User;
-import com.example.demo.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.user.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.rent.service.RentService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.HashMap;
 
 @RestController
@@ -24,22 +21,21 @@ import java.util.HashMap;
 public class RentController {
 
   private final RentService rentService;
-  private final UserRepository userRepository;
+  private final UserService userService;
 
-  public RentController(RentService rentService, UserRepository userRepository) {
+  public RentController(RentService rentService, UserService userService) {
     this.rentService = rentService;
-    this.userRepository = userRepository;
+    this.userService = userService;
   }
 
   @PostMapping(consumes = "multipart/form-data")
   public ResponseEntity<?> createRental(
           @ModelAttribute CreateRentalDto requestBody,
-          @RequestParam("picture") MultipartFile file) {
+          @RequestParam("picture") MultipartFile file,
+          Principal principal
+  ) {
 
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String email = (String) authentication.getPrincipal();
-    User user = userRepository.findByEmail(email).orElse(null);
-
+    User user = userService.findUserByEmail(principal.getName());
     if (user == null) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur introuvable");
     }
