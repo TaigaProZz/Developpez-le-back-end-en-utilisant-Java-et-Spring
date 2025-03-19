@@ -1,6 +1,8 @@
 package com.example.demo.rent.service;
 
+import com.example.demo.rent.dto.CreateRentalDto;
 import com.example.demo.rent.dto.GetRentalDto;
+import com.example.demo.rent.dto.UpdateRentalDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,33 @@ public class RentService {
   @Autowired
   private RentRepository rentRepository;
 
+  public Rent saveRent(CreateRentalDto rent, Long userId) {
+
+    Rent newRent = new Rent();
+    newRent.setName(rent.getName());
+    newRent.setSurface(rent.getSurface());
+    newRent.setPrice(rent.getPrice());
+//    newRent.setPicture(rent.getPicture());
+    newRent.setDescription(rent.getDescription());
+    newRent.setOwner_id(userId);
+
+    return this.rentRepository.save(newRent);
+  }
+
+  public Rent updateRent(Long id, UpdateRentalDto rent) {
+    Rent rentToUpdate = this.rentRepository.findById(id).orElse(null);
+
+    if (rentToUpdate == null) {
+      return null;
+    }
+
+    rentToUpdate.setName(rent.getName());
+    rentToUpdate.setSurface(rent.getSurface());
+    rentToUpdate.setPrice(rent.getPrice());
+    rentToUpdate.setDescription(rent.getDescription());
+
+    return this.rentRepository.save(rentToUpdate);
+  }
 
   public Iterable<GetRentalDto> getAllRents() {
     List<GetRentalDto> allRentsDto = new ArrayList<>();
@@ -26,6 +55,7 @@ public class RentService {
     for (Rent rent : rents) {
       GetRentalDto dto = new GetRentalDto();
       dto.setId(rent.getId());
+      dto.setName(rent.getName());
       dto.setSurface(rent.getSurface());
       dto.setPrice(rent.getPrice());
       dto.setPicture(rent.getPicture());
@@ -40,7 +70,6 @@ public class RentService {
     return allRentsDto;
   }
 
-
   public GetRentalDto getRentalDtoById(Long id) {
     Rent rent = rentRepository.findById(id).orElse(null);
     if (rent == null) {
@@ -48,6 +77,7 @@ public class RentService {
     }
     GetRentalDto dto = new GetRentalDto();
     dto.setId(rent.getId());
+    dto.setName(rent.getName());
     dto.setSurface(rent.getSurface());
     dto.setPrice(rent.getPrice());
     dto.setPicture(rent.getPicture());
@@ -57,6 +87,4 @@ public class RentService {
     dto.setUpdated_at(rent.getUpdatedAt());
     return dto;
   }
-
-
 }
