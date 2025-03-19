@@ -67,12 +67,13 @@ public class RentController {
     return ResponseEntity.ok(response);
   }
 
-  @GetMapping("/")
-  public ResponseEntity<Iterable<GetRentalDto>> getAllRents() {
+  @GetMapping()
+  public ResponseEntity<HashMap<String, Object>> getAllRents() {
 
     Iterable<GetRentalDto> getRentalsDto = rentService.getAllRents();
-
-    return ResponseEntity.ok(getRentalsDto);
+    HashMap<String, Object> response = new HashMap<>();
+    response.put("rentals", getRentalsDto);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
