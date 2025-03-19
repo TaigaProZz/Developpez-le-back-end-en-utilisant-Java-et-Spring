@@ -25,7 +25,7 @@ public class MessageController {
    * such as the message content, user ID, and rental ID
    * @return a ResponseEntity containing a success response message
    */
-  @PostMapping("/")
+  @PostMapping()
   public ResponseEntity<?> sendMessage(@RequestBody SendMessageDto sendMessageDto) {
     Message message = new Message();
 
