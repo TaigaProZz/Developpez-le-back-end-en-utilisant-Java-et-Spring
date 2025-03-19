@@ -1,10 +1,12 @@
 package com.example.demo.auth.filter;
 
-import com.example.demo.utils.PublicRoutes;
-import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -17,8 +19,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
 
-  public JwtAuthenticationFilter(JwtService jwtService) {
+  private final UserDetailsService userDetailsService;
+
+  public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
     this.jwtService = jwtService;
+    this.userDetailsService = userDetailsService;
   }
 
   @Override
@@ -27,34 +32,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain)
           throws jakarta.servlet.ServletException, IOException {
 
-    String requestPath = request.getServletPath();
+    try {
+      String jwt = extractJwtFromRequest(request);
+      if (jwt != null && jwtService.validateToken(jwt)) {
+        String username = jwtService.getEmailFromToken(jwt);
 
-    // swagger authorization
-    if (requestPath.startsWith("/swagger-ui") || requestPath.startsWith("/api/v3/api-docs")) {
-      filterChain.doFilter(request, response);
-      return;
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+      }
+    } catch (Exception e) {
     }
-
-    // public endpoints authorization
-    if (Arrays.asList(PublicRoutes.PUBLIC_URLS).contains(requestPath)) {
-      filterChain.doFilter(request, response);
-      return;
-    }
-
-    // extract token and check its validity
-    String token = extractJwtFromRequest(request);
-
-    // if not valid, return unauthorized err
-    if (token == null || !jwtService.validateToken(token)) {
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.getWriter().flush();
-      return;
-    }
-
-    // if valid, authorize the request
-    String email = jwtService.getEmailFromToken(token);
-    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null, null);
-    SecurityContextHolder.getContext().setAuthentication(authentication);
 
     filterChain.doFilter(request, response);
   }

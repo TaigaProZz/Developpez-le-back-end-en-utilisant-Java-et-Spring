@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/rentals")
+@RequestMapping("/api/rentals")
 public class RentController {
 
   private final RentService rentService;

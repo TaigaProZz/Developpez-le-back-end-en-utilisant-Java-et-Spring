@@ -5,6 +5,6 @@ public class PublicRoutes {
             "/api/auth/login",
             "/api/auth/register",
             "/swagger-ui/**",
-            "/api/v3/api-docs/**"
+            "/v3/api-docs/**"
     };
 }

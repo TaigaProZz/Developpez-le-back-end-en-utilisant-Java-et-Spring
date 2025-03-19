@@ -7,6 +7,7 @@ import com.example.demo.auth.service.JwtService;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repository.UserRepository;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
   private final UserRepository userRepository;
@@ -83,11 +84,10 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<?> me() {
+  public ResponseEntity<?> me(Principal principal) {
     // get current user from context
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String email = (String) authentication.getPrincipal();
-    User user = userRepository.findByEmail(email).orElse(null);
+
+    User user = userRepository.findByEmail(principal.getName()).orElse(null);
 
     if (user == null) {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur introuvable");
@@ -96,7 +96,7 @@ public class AuthController {
     // map to dto
     GetUserDto getUserDto = new GetUserDto();
     getUserDto.setId(user.getId());
-    getUserDto.setEmail(email);
+    getUserDto.setEmail(user.getEmail());
     getUserDto.setName(user.getName());
     getUserDto.setCreated_at(user.getCreatedAt());
     getUserDto.setUpdated_at(user.getUpdatedAt());
