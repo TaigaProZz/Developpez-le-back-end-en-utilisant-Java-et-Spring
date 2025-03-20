@@ -6,7 +6,6 @@ import com.example.demo.user.dto.GetUserDto;
 import com.example.demo.auth.dto.RegisterDto;
 
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -32,28 +31,21 @@ public class AuthController {
   public ResponseEntity<Map<String,Object>> login(@RequestBody LoginDto loginDto) {
     // try to log in and get token
     String token = this.authService.login(loginDto);
-
-    Map<String, Object> response = new HashMap<>();
-    response.put("token", token);
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(Map.of("token", token));
   }
-
 
   @PostMapping("/register")
   public ResponseEntity<?> register(@RequestBody RegisterDto registerDto) {
     // save user and get the token
     String token = authService.registerUser(registerDto);
-
-    Map<String, Object> response = new HashMap<>();
-    response.put("token", token);
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(Map.of("token", token));
   }
 
+  // return authenticated user infos
   @GetMapping("/me")
   public ResponseEntity<?> me(Principal principal) {
     // get user infos
     GetUserDto getUserDto = authService.me(principal);
-
     return ResponseEntity.ok(getUserDto);
   }
 }

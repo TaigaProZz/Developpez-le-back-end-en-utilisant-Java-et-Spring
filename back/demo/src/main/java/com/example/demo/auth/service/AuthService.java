@@ -34,11 +34,12 @@ public class AuthService {
    * @return A JWT token for the successfully registered user.
    */
   public String registerUser(RegisterDto registerDto) {
-
+    // check if email is already used
     if (this.userService.findUserByEmail(registerDto.getEmail()) != null) {
       throw new EmailAlreadyUsedException("Email déjà utilisée.");
     }
 
+    // save user on db and return a token
     this.userService.saveUser(registerDto);
     return jwtService.generateToken(registerDto.getEmail());
   }
@@ -53,10 +54,8 @@ public class AuthService {
    *                              if the provided password is incorrect.
    */
   public String login(LoginDto loginDto) {
-    // try to find user by email
+    // try to find user by email. if user not found or password is incorrect
     User user = userService.findUserByEmail(loginDto.getEmail());
-
-    // if user not found or password is incorrect
     if (user == null || !passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
       throw new LoginFailedException("Email ou mot de passe incorrect.");
     }
@@ -64,7 +63,6 @@ public class AuthService {
     // generate token and return it
     return jwtService.generateToken(user.getEmail());
   }
-
 
   /**
    * Retrieves the currently logged-in user's details based on the provided {@link Principal}.
@@ -78,9 +76,8 @@ public class AuthService {
    * @throws UserNotFoundException If no user is found in the database with the email obtained from the principal.
    */
   public GetUserDto me(Principal principal) {
-    // get current user from context
+    // get current user and check if user is valid
     User user = userService.findUserByEmail(principal.getName());
-
     if (user == null) {
       throw new UserNotFoundException("Utilisateur introuvable.");
     }
@@ -94,5 +91,4 @@ public class AuthService {
     getUserDto.setUpdated_at(user.getUpdatedAt());
     return getUserDto;
   }
-
 }

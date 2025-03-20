@@ -1,11 +1,8 @@
 package com.example.demo.user.controller;
 
-import com.example.demo.errors.UserNotFoundException;
 import com.example.demo.user.dto.GetUserDto;
 import com.example.demo.user.model.User;
-import com.example.demo.user.repository.UserRepository;
 import com.example.demo.user.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +18,7 @@ public class UserController {
 
   @GetMapping("/{id}")
   public ResponseEntity<?> getUserById(@PathVariable Long id) {
-
+    // try to find user by id
     User user = userService.findUserById(id);
 
     // map to dto
@@ -32,6 +29,7 @@ public class UserController {
     getUserDto.setCreated_at(user.getCreatedAt());
     getUserDto.setUpdated_at(user.getUpdatedAt());
 
+    // and return it
     return ResponseEntity.ok(getUserDto);
   }
 }

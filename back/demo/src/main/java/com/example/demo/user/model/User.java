@@ -1,6 +1,5 @@
 package com.example.demo.user.model;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,9 +21,7 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
   private String email;
-
   private String name;
 
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

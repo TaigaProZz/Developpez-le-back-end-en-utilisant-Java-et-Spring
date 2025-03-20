@@ -15,17 +15,11 @@ public class Rent {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
   private String name;
-
   private Long surface;
-
   private Long price;
-
   private String description;
-
   private String picture;
-
   private Long owner_id;
 
   @Column(name = "created_at", updatable = false)

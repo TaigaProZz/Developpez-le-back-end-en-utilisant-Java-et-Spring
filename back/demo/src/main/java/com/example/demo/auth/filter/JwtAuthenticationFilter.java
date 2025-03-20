@@ -13,7 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.example.demo.auth.service.JwtService;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -26,6 +25,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     this.userDetailsService = userDetailsService;
   }
 
+  /**
+   * Processes the incoming HTTP request to authenticate the user based on the JWT token present in the
+   * Authorization header. If the token is valid, sets the authentication context with the user's details.
+   *
+   * @param request      the HTTP request containing the JWT token in the Authorization header
+   * @param response     the HTTP response
+   * @param filterChain  the filter chain for further request processing
+   * @throws jakarta.servlet.ServletException if an error occurs during filter execution
+   * @throws IOException                      if an I/O error occurs during filter execution
+   */
   @Override
   protected void doFilterInternal(
           jakarta.servlet.http.HttpServletRequest request,
@@ -47,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
-    } catch (Exception e) {
+    } catch (Exception ignored) {
     }
 
     filterChain.doFilter(request, response);

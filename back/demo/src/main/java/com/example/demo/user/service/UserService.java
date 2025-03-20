@@ -27,6 +27,7 @@ public class UserService {
    * @return The User object if a user with the given email exists; otherwise, null.
    */
   public User findUserByEmail(String email) {
+    // try to find user by email, or assign null
     return this.userRepository.findByEmail(email).orElse(null);
   }
 
@@ -38,11 +39,13 @@ public class UserService {
    * @throws UserNotFoundException if no user with the specified id is found.
    */
   public User findUserById(Long id) {
+    // try to find user by id, and throw error if not found
     User user = this.userRepository.findById(id).orElse(null);
-
     if (user == null) {
       throw new UserNotFoundException("Utilisateur introuvable.");
     }
+
+    // return user if found
     return user;
   }
 
@@ -52,14 +55,15 @@ public class UserService {
    *
    * @param registerDto An object containing the registration details of the user,
    *                    including email, password, and name.
-   * @return The saved User object.
    */
-  public User saveUser(RegisterDto registerDto) {
+  public void saveUser(RegisterDto registerDto) {
+    // bind to user
     User user = new User();
     user.setEmail(registerDto.getEmail());
     user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
     user.setName(registerDto.getName());
 
-    return this.userRepository.save(user);
+    // and save it in db
+    this.userRepository.save(user);
   }
 }
