@@ -30,16 +30,9 @@ public class MessageController {
    */
   @PostMapping()
   public ResponseEntity<?> sendMessage(@RequestBody SendMessageDto sendMessageDto) {
-    Message message = new Message();
+    // save message to db
+    messageService.saveMessage(sendMessageDto);
 
-    message.setMessage(sendMessageDto.getMessage());
-    message.setUser_id(sendMessageDto.getUser_id());
-    message.setRental_id(sendMessageDto.getRental_id());
-
-    messageService.saveMessage(message);
-
-    Map<String, Object> response = new HashMap<>();
-    response.put("message", "Message send with success");
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(Map.of("message", "Message send with success"));
   }
 }
