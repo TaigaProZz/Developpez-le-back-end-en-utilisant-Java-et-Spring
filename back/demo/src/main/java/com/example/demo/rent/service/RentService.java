@@ -20,13 +20,13 @@ public class RentService {
   @Autowired
   private RentRepository rentRepository;
 
-  public Rent saveRent(CreateRentalDto rent, Long userId) {
+  public Rent saveRent(CreateRentalDto rent, String filePath, Long userId) {
 
     Rent newRent = new Rent();
     newRent.setName(rent.getName());
     newRent.setSurface(rent.getSurface());
     newRent.setPrice(rent.getPrice());
-//    newRent.setPicture(rent.getPicture());
+    newRent.setPicture(filePath);
     newRent.setDescription(rent.getDescription());
     newRent.setOwner_id(userId);
 
