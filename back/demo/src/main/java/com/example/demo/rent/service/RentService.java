@@ -1,43 +1,66 @@
 package com.example.demo.rent.service;
 
+import com.example.demo.errors.RentNotFoundException;
+import com.example.demo.errors.UserNotFoundException;
 import com.example.demo.rent.dto.CreateRentalDto;
 import com.example.demo.rent.dto.GetRentalDto;
 import com.example.demo.rent.dto.UpdateRentalDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.user.model.User;
+import com.example.demo.user.service.UserService;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.rent.model.Rent;
 import com.example.demo.rent.repository.RentRepository;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Service
 public class RentService {
-  @Autowired
-  private RentRepository rentRepository;
 
-  public Rent saveRent(CreateRentalDto rent, String filePath, Long userId) {
+  private final RentRepository rentRepository;
+  private final FileStorageService fileStorageService;
+  private final UserService userService;
 
-    Rent newRent = new Rent();
-    newRent.setName(rent.getName());
-    newRent.setSurface(rent.getSurface());
-    newRent.setPrice(rent.getPrice());
-    newRent.setPicture(filePath);
-    newRent.setDescription(rent.getDescription());
-    newRent.setOwner_id(userId);
-
-    return this.rentRepository.save(newRent);
+  public RentService(RentRepository rentRepository, FileStorageService fileStorageService, UserService userService) {
+    this.rentRepository = rentRepository;
+    this.fileStorageService = fileStorageService;
+    this.userService = userService;
   }
 
-  public Rent updateRent(Long id, UpdateRentalDto rent) {
-    Rent rentToUpdate = this.rentRepository.findById(id).orElse(null);
+  public void saveRent(CreateRentalDto requestBody, MultipartFile file, Principal principal) throws IOException {
+    // check if owner user exists, throw error if not found
+    User user = userService.findUserByEmail(principal.getName());
+    if (user == null) {
+      throw new UserNotFoundException("Utilisateur introuvable.");
+    }
 
+    // store image file
+    String filePath = fileStorageService.saveFile(file);
+
+    // and save object to db
+    System.out.println(requestBody);
+    Rent rent = new Rent();
+    rent.setName(requestBody.getName());
+    rent.setSurface(requestBody.getSurface());
+    rent.setPrice(requestBody.getPrice());
+    rent.setPicture(filePath);
+    rent.setDescription(requestBody.getDescription());
+    rent.setOwner_id(user.getId());
+    rentRepository.save(rent);
+  }
+
+  public void updateRent(Long id, UpdateRentalDto rent) {
+    // try to fetch the rent, throw error if not found
+    Rent rentToUpdate = this.rentRepository.findById(id).orElse(null);
     if (rentToUpdate == null) {
-      return null;
+      throw new RentNotFoundException("Location introuvable");
     }
 
     rentToUpdate.setName(rent.getName());
@@ -45,7 +68,7 @@ public class RentService {
     rentToUpdate.setPrice(rent.getPrice());
     rentToUpdate.setDescription(rent.getDescription());
 
-    return this.rentRepository.save(rentToUpdate);
+    this.rentRepository.save(rentToUpdate);
   }
 
   public Iterable<GetRentalDto> getAllRents() {
@@ -71,10 +94,12 @@ public class RentService {
   }
 
   public GetRentalDto getRentalDtoById(Long id) {
+    // try to get the rent, throw error if not found
     Rent rent = rentRepository.findById(id).orElse(null);
     if (rent == null) {
-      return null;
+      throw new RentNotFoundException("Location introuvable");
     }
+
     GetRentalDto dto = new GetRentalDto();
     dto.setId(rent.getId());
     dto.setName(rent.getName());

@@ -1,5 +1,6 @@
 package com.example.demo.rent.controller;
 
+import com.example.demo.errors.RentNotFoundException;
 import com.example.demo.errors.UserNotFoundException;
 import com.example.demo.rent.dto.CreateRentalDto;
 import com.example.demo.rent.dto.GetRentalDto;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/rentals")
@@ -44,89 +46,43 @@ public class RentController {
   public ResponseEntity<?> createRental(
           @ModelAttribute CreateRentalDto requestBody,
           @RequestParam("picture") MultipartFile file,
-          Principal principal
-  ) {
-
-    // get user id to link it to the rent
-    User user = userService.findUserByEmail(principal.getName());
-    if (user == null) {
-      throw new UserNotFoundException("Utilisateur introuvable.");
-    }
-    Long userId = user.getId();
-
+          Principal principal)
+  {
     try {
-      // define file's save directory
-      String uploadsDir = new File("./uploads/images/").getCanonicalPath();
-      File directory = new File(uploadsDir);
+      // save rent
+      rentService.saveRent(requestBody, file, principal);
 
-      if (!directory.exists() && !directory.mkdirs()) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la création du dossier d'upload");
-      }
-
-      // check if file is empty
-      if (file.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le fichier est vide");
-      }
-
-      // check if file is an image
-      if (!file.getContentType().startsWith("image/")) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le fichier n'est pas une image");
-      }
-
-      // create filename and file, and save it
-      String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-      File destinationFile = new File(directory, fileName);
-      file.transferTo(destinationFile);
-
-      // define filepath who will be saved in db
-      String filePath = "/api/images/" + fileName;
-
-      // save rent in db
-      rentService.saveRent(requestBody, filePath, userId);
-
-      // response
-      HashMap<String, Object> response = new HashMap<>();
-      response.put("message", "Rental created !");
-      return ResponseEntity.ok(response);
-
+      return ResponseEntity.ok().body(Map.of("message", "Rental created !"));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'enregistrement du fichier");
+      return ResponseEntity.internalServerError().body("Erreur lors de l'enregistrement du fichier");
     }
   }
 
   @PutMapping(path = "/{id}",  consumes = "multipart/form-data")
   public ResponseEntity<?> updateRental(
           @ModelAttribute UpdateRentalDto requestBody,
-          @PathVariable Long id) {
+          @PathVariable Long id)
+  {
+    // try to update rent
+    rentService.updateRent(id, requestBody);
 
-    Rent rent = rentService.updateRent(id, requestBody);
-
-    if(rent == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Location introuvable");
-    }
-
-    HashMap<String, Object> response = new HashMap<>();
-    response.put("message", "Rental updated !");
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(Map.of("message", "Rental updated !"));
   }
 
   @GetMapping()
-  public ResponseEntity<HashMap<String, Object>> getAllRents() {
-
+  public ResponseEntity<Map<String, Iterable<GetRentalDto>>> getAllRents() {
+    // get list of all rents
     Iterable<GetRentalDto> getRentalsDto = rentService.getAllRents();
-    HashMap<String, Object> response = new HashMap<>();
-    response.put("rentals", getRentalsDto);
-    return ResponseEntity.ok(response);
+
+    return ResponseEntity.ok(Map.of("rentals", getRentalsDto));
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<?> getRentalById(@PathVariable Long id) {
-
+    // try to fetch rental by id
     GetRentalDto getRentalDto = rentService.getRentalDtoById(id);
-
-    if (getRentalDto == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Location introuvable");
-    }
 
     return ResponseEntity.ok(getRentalDto);
   }
