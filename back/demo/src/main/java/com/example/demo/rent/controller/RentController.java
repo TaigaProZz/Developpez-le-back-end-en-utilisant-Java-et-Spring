@@ -1,5 +1,6 @@
 package com.example.demo.rent.controller;
 
+import com.example.demo.errors.UserNotFoundException;
 import com.example.demo.rent.dto.CreateRentalDto;
 import com.example.demo.rent.dto.GetRentalDto;
 import com.example.demo.rent.dto.UpdateRentalDto;
@@ -49,7 +50,7 @@ public class RentController {
     // get user id to link it to the rent
     User user = userService.findUserByEmail(principal.getName());
     if (user == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur introuvable");
+      throw new UserNotFoundException("Utilisateur introuvable.");
     }
     Long userId = user.getId();
 

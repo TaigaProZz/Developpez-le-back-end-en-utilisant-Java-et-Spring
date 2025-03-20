@@ -64,7 +64,6 @@ public class AuthController {
 
   @PostMapping("/register")
   public ResponseEntity<?> register(@RequestBody RegisterDto registerDto) {
-
     // save user and get the token
     String token = authService.registerUser(registerDto);
 
@@ -75,21 +74,8 @@ public class AuthController {
 
   @GetMapping("/me")
   public ResponseEntity<?> me(Principal principal) {
-    // get current user from context
-
-    User user = userRepository.findByEmail(principal.getName()).orElse(null);
-
-    if (user == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur introuvable");
-    }
-
-    // map to dto
-    GetUserDto getUserDto = new GetUserDto();
-    getUserDto.setId(user.getId());
-    getUserDto.setEmail(user.getEmail());
-    getUserDto.setName(user.getName());
-    getUserDto.setCreated_at(user.getCreatedAt());
-    getUserDto.setUpdated_at(user.getUpdatedAt());
+    // get user infos
+    GetUserDto getUserDto = authService.me(principal);
 
     return ResponseEntity.ok(getUserDto);
   }

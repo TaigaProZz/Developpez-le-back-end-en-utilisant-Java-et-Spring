@@ -1,8 +1,10 @@
 package com.example.demo.user.controller;
 
+import com.example.demo.errors.UserNotFoundException;
 import com.example.demo.user.dto.GetUserDto;
 import com.example.demo.user.model.User;
 import com.example.demo.user.repository.UserRepository;
+import com.example.demo.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,20 +13,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 public class UserController {
 
-  private final UserRepository userRepository;
+  private final UserService userService;
 
-  public UserController(UserRepository userRepository) {
-    this.userRepository = userRepository;
+  public UserController(UserService userService) {
+    this.userService = userService;
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<?> getUserById(@PathVariable Long id) {
 
-    User user = userRepository.findById(id).orElse(null);
-
-    if (user == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur introuvable");
-    }
+    User user = userService.findUserById(id);
 
     // map to dto
     GetUserDto getUserDto = new GetUserDto();
