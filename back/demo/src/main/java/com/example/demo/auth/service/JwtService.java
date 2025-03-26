@@ -3,13 +3,14 @@ package com.example.demo.auth.service;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
 public class JwtService {
-
-  private final String SECRET_KEY = "fcf730b6d95236ecd3c9fc2d92d7b6b2bb061514961aec041d6c7a7192f592e4";
+  @Value("${env.JWT_SECRET}")
+  private String SECRET_KEY;
 
    private static final long EXPIRATION_TIME = 86400000;
 
