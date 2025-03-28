@@ -1,6 +1,7 @@
 package com.example.demo.auth.controller;
 
 import com.example.demo.auth.dto.LoginDto;
+import com.example.demo.auth.dto.TokenDto;
 import com.example.demo.auth.service.AuthService;
 import com.example.demo.user.dto.GetUserDto;
 import com.example.demo.auth.dto.RegisterDto;
@@ -28,22 +29,22 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Map<String,Object>> login(@RequestBody LoginDto loginDto) {
+  public ResponseEntity<TokenDto> login(@RequestBody LoginDto loginDto) {
     // try to log in and get token
     String token = this.authService.login(loginDto);
-    return ResponseEntity.ok(Map.of("token", token));
+    return ResponseEntity.ok(new TokenDto(token));
   }
 
   @PostMapping("/register")
-  public ResponseEntity<?> register(@RequestBody RegisterDto registerDto) {
+  public ResponseEntity<TokenDto> register(@RequestBody RegisterDto registerDto) {
     // save user and get the token
     String token = authService.registerUser(registerDto);
-    return ResponseEntity.ok(Map.of("token", token));
+    return ResponseEntity.ok(new TokenDto(token));
   }
 
   // return authenticated user infos
   @GetMapping("/me")
-  public ResponseEntity<?> me(Principal principal) {
+  public ResponseEntity<GetUserDto> me(Principal principal) {
     // get user infos
     GetUserDto getUserDto = authService.me(principal);
     return ResponseEntity.ok(getUserDto);
