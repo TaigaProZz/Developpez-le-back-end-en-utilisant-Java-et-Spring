@@ -1,6 +1,7 @@
 package com.example.demo.message.service;
 
 import com.example.demo.message.dto.SendMessageDto;
+import com.example.demo.message.dto.SendMessageResponseDto;
 import com.example.demo.rent.service.RentService;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class MessageService {
    *
    * @param sendMessageDto the Message object to be saved
    */
-  public void saveMessage(SendMessageDto sendMessageDto) {
+  public SendMessageResponseDto saveMessage(SendMessageDto sendMessageDto) {
     rentService.getRentalDtoById(sendMessageDto.getRental_id());
     Message message = new Message();
 
@@ -32,5 +33,6 @@ public class MessageService {
     message.setRental_id(sendMessageDto.getRental_id());
 
     this.messageRepository.save(message);
+    return new SendMessageResponseDto("Message send with success");
   }
 }
