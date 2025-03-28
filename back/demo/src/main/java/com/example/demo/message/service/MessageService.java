@@ -7,9 +7,6 @@ import org.springframework.stereotype.Service;
 import com.example.demo.message.model.Message;
 import com.example.demo.message.repository.MessageRepository;
 
-import lombok.Data;
-
-@Data
 @Service
 public class MessageService {
 
@@ -28,7 +25,6 @@ public class MessageService {
    */
   public void saveMessage(SendMessageDto sendMessageDto) {
     rentService.getRentalDtoById(sendMessageDto.getRental_id());
-    System.out.println(sendMessageDto);
     Message message = new Message();
 
     message.setMessage(sendMessageDto.getMessage());
